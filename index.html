@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculador de pagos de cuotas</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Calculador de pagos de cuotas</h1>
+        <div class="content">
+            <div id="categorySummary" class="summary-container">
+                <h2>Resumen de Deuda:</h2>
+                <div id="chartAndSummary">
+                    <div id="debtChartContainer">
+                        <canvas id="debtChart" width="220" height="220" style="display: block; box-sizing: border-box; height: 220px; width: 220px;"></canvas>
+                        <div id="chartCenterText" class="chart-center-text">$0.00</div>
+                    </div>
+                    <div id="debtSummary"></div>
+                </div>
+            </div>
+            <div class="form-container">
+                <h2>Listado de Productos Agregados</h2>
+                <div class="header-container">
+                    <div class="sorting-container">
+                        <label>Ordenar por:</label>
+                        <div class="sorting-buttons">
+                            <button id="sortName" class="sort-button" onclick="sortProducts('name')">Nombre</button>
+                            <button id="sortInstallments" class="sort-button" onclick="sortProducts('installments')">Cuotas</button>
+                            <button id="sortPrice" class="sort-button" onclick="sortProducts('price')">Precio</button>
+                            <button id="sortCategory" class="sort-button" onclick="sortProducts('category')">Categoría</button>
+                        </div>
+                    </div>
+                    <button class="add-product-button" onclick="openModal()">+ Agregar Nuevo</button>
+                </div>
+                <div id="productList" class="scrollable"></div>
+            </div>
+            <div id="totalPayments" class="payments-container"></div>
+        </div>
+    </div>
+
+    <div id="modalOverlay" class="modal-overlay">
+        <div id="productModal" class="modal">
+            <span class="close" onclick="closeModal()">×</span>
+            <h2>Agregar Producto</h2>
+            <form id="productForm">
+                <div class="form-group-inline">
+                    <label for="productName">Nombre del producto:</label>
+                    <input type="text" id="productName" name="productName">
+                </div>
+                <div class="form-group-inline">
+                    <label for="productPrice">Precio del producto:</label>
+                    <input type="number" id="productPrice" name="productPrice" step="0.01">
+                </div>
+                <div class="form-group-inline">
+                    <label for="productCategory">Categoría:</label>
+                    <select id="productCategory" name="productCategory">
+                        <option value="">Selecciona una categoría</option>
+                        <option value="Cuentas Fijas">Cuentas Fijas</option>
+                        <option value="Comida">Comida</option>
+                        <option value="Entretenimiento">Entretenimiento</option>
+                        <option value="Electrodomésticos">Electrodomésticos</option>
+                        <option value="Ferretería">Ferretería</option>
+                        <option value="Farmacia">Farmacia</option>
+                        <option value="Indulgencias">Indulgencias</option>
+                    </select>
+                </div>
+                <div class="form-group-inline">
+                    <label>Número de cuotas:</label>
+                    <div class="installments-container">
+                        <input type="radio" id="installment1" name="productInstallments" value="1">
+                        <label for="installment1">1</label>
+                        <input type="radio" id="installment2" name="productInstallments" value="2">
+                        <label for="installment2">2</label>
+                        <input type="radio" id="installment3" name="productInstallments" value="3">
+                        <label for="installment3">3</label>
+                        <input type="radio" id="installment6" name="productInstallments" value="6">
+                        <label for="installment6">6</label>
+                        <input type="radio" id="installment8" name="productInstallments" value="8">
+                        <label for="installment8">8</label>
+                        <input type="radio" id="installment12" name="productInstallments" value="12">
+                        <label for="installment12">12</label>
+                    </div>
+                </div>
+                <div class="form-group-inline">
+                    <button type="submit" class="submit-button">Agregar Producto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>

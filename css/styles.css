@@ -1,0 +1,303 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+h1 {
+    text-align: center;
+    color: #007acc;
+}
+
+h2 {
+    color: #007acc;
+    margin-bottom: 10px;
+}
+
+.summary-container,
+.form-container,
+.payments-container {
+    margin-bottom: 30px;
+}
+
+#chartAndSummary {
+    display: flex;
+    align-items: center;
+}
+
+#debtChartContainer {
+    flex: 1;
+    position: relative;
+}
+
+#chartCenterText {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    font-weight: bold;
+}
+
+#debtSummary {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.debt-summary-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.category-color {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.category-icon {
+    font-size: 16px;
+}
+
+.category-name {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.category-total {
+    color: #666;
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.sorting-container {
+    display: flex;
+    align-items: center;
+}
+
+.sorting-buttons {
+    display: flex;
+}
+
+.sort-button {
+    border: 1px solid #007acc;
+    background-color: white;
+    color: #007acc;
+    padding: 5px 10px;
+    margin-right: 5px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.sort-button.active {
+    background-color: #007acc;
+    color: #313131;
+}
+
+.sort-button.active.desc::after {
+    content: " ▼";
+}
+
+.sort-button.active.asc::after {
+    content: " ▲";
+}
+
+.add-product-button {
+    background-color: #007acc;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.add-product-button:hover {
+    background-color: #005f99;
+}
+
+.product-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 5px;
+    border-radius: 4px;
+}
+
+.product-item button {
+    background-color: #ff4d4d;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.product-item button:hover {
+    background-color: #cc0000;
+}
+
+.payment-item {
+    margin-bottom: 10px;
+}
+
+.payment-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f0f0f0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.payment-details {
+    display: none;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-top: -1px;
+}
+
+.payment-details.active {
+    display: block;
+}
+
+.details-text {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.category-group {
+    margin-bottom: 10px;
+    flex: 1;
+}
+
+.category-header {
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+
+.category-icon {
+    margin-right: 5px;
+}
+
+.donut-chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.donut-chart-center-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 500px;
+    max-width: 90%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.form-group-inline {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.form-group-inline label {
+    width: 150px;
+}
+
+.installments-container {
+    display: flex;
+}
+
+.installments-container input[type="radio"] {
+    display: none;
+}
+
+.installments-container label {
+    margin-right: 10px;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.installments-container input[type="radio"]:checked + label {
+    background-color: #007acc;
+    color: #fff;
+}
+
+.submit-button {
+    background-color: #007acc;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.submit-button:hover {
+    background-color: #005f99;
+}
