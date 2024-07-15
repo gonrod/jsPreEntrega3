@@ -24,15 +24,17 @@ h2 {
     margin-bottom: 10px;
 }
 
-.summary-container,
-.form-container,
-.payments-container {
-    margin-bottom: 30px;
+#categorySummary {
+    display: flex;
+    justify-content: space-between;
 }
 
 #chartAndSummary {
     display: flex;
     align-items: center;
+    flex: 1;
+    justify-content: space-between;
+    gap: 20px;
 }
 
 #debtChartContainer {
@@ -50,7 +52,7 @@ h2 {
 }
 
 #debtSummary {
-    flex: 1;
+    flex: 3;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -72,10 +74,6 @@ h2 {
     margin-right: 10px;
 }
 
-.category-icon {
-    font-size: 16px;
-}
-
 .category-name {
     font-weight: bold;
     margin-right: 5px;
@@ -83,6 +81,18 @@ h2 {
 
 .category-total {
     color: #666;
+}
+
+#monthlyEvolution {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.chart-container {
+    width: 100%;
+    height: 300px; /* Ajustar la altura del gráfico según sea necesario */
 }
 
 .header-container {
@@ -139,54 +149,96 @@ h2 {
     background-color: #005f99;
 }
 
-.product-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border: 1px solid #ddd;
-    margin-bottom: 5px;
-    border-radius: 4px;
+.table-container {
+    display: table;
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px; /* Agregado para separar de otros contenidos */
 }
 
-.product-item button {
+.table-header {
+    display: table-header-group;
+    background-color: #007acc;
+    color: white;
+    font-weight: bold;
+    text-align: left;
+}
+
+.table-body {
+    display: table-row-group;
+}
+
+.table-row {
+    display: table-row;
+}
+
+.table-cell,
+.table-cell-header {
+    display: table-cell;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.table-cell-header {
+    cursor: pointer;
+}
+
+.table-cell-header.active {
+    background-color: #005f99;
+}
+
+.table-cell-header.asc::after {
+    content: " ▲";
+}
+
+.table-cell-header.desc::after {
+    content: " ▼";
+}
+
+.table-cell button {
     background-color: #ff4d4d;
     color: #fff;
     border: none;
     padding: 5px 10px;
     border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-.product-item button:hover {
+.table-cell button:hover {
     background-color: #cc0000;
 }
 
 .payment-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    transition: box-shadow 0.3s;
     margin-bottom: 10px;
+}
+
+.payment-item:hover {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
 }
 
 .payment-item-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
-    background-color: #f0f0f0;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
     cursor: pointer;
+    margin-bottom: 10px;
+    gap: 6px;
+    background: #007acc;
+    color: #fefefe;
 }
 
-.payment-details {
-    display: none;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-top: -1px;
-}
-
-.payment-details.active {
-    display: block;
+.donut-chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
 }
 
 .details-text {
@@ -203,17 +255,6 @@ h2 {
     font-weight: bold;
     display: flex;
     align-items: center;
-}
-
-.category-icon {
-    margin-right: 5px;
-}
-
-.donut-chart-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
 }
 
 .donut-chart-center-text {
@@ -300,4 +341,11 @@ h2 {
 
 .submit-button:hover {
     background-color: #005f99;
+}
+
+.payments-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 10px; /* Separar de otros contenidos */
 }

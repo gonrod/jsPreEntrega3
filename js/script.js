@@ -2,6 +2,7 @@ let products = [];
 let originalOrder = [];
 let currentSort = { key: null, direction: 1 };
 let chart = null; // Variable para almacenar la instancia de Chart.js
+let evoChart = null; // Variable para la evolución del gráfico
 
 // Iconos de categorías
 const categoryIcons = {
@@ -24,13 +25,6 @@ const categoryColors = {
     'Farmacia': '#FF9F40',
     'Indulgencias': '#8BC34A'
 };
-
-document.addEventListener('DOMContentLoaded', (event) => {
-    loadProductsFromStorage();
-    displayProducts();
-    calculateTotalPayments(); // Calcular pagos totales al cargar
-    calculateCategorySummary(); // Calcular resumen de deuda por categoría
-});
 
 // Función para abrir el modal
 function openModal() {
@@ -84,6 +78,7 @@ function addProduct() {
     closeModal(); // Cerrar el modal
     calculateTotalPayments(); // Calcular pagos totales
     calculateCategorySummary(); // Calcular resumen de deuda por categoría
+    calculateMonthlyEvolution(); // Calcular evolución mensual
 }
 
 // Función para mostrar los productos
@@ -97,15 +92,15 @@ function displayProducts() {
         const endDate = product.endDate ? new Date(product.endDate) : new Date(startDate);
 
         const productItem = document.createElement('div');
-        productItem.className = 'product-item';
+        productItem.className = 'table-row';
         productItem.innerHTML = `
-            <span class="product-name"><strong>${categoryIcons[product.category]}</strong> ${product.name}</span>
-            <span class="product-price"><strong>Precio:</strong> $${product.price.toFixed(2)}</span>
-            <span class="product-installments"><strong>Cuotas:</strong> ${product.installments}</span>
-            <span class="product-category"><strong>Categoría:</strong> ${product.category}</span>
-            <span class="product-start-date"><strong>Fecha de inicio:</strong> ${startDate.toLocaleDateString()}</span>
-            <span class="product-end-date"><strong>Fecha de fin:</strong> ${endDate.toLocaleDateString()}</span>
-            <button onclick="removeProduct(${index})">&times;</button>
+            <div class="table-cell">${categoryIcons[product.category]} ${product.name}</div>
+            <div class="table-cell">$${product.price.toFixed(2)}</div>
+            <div class="table-cell">${product.installments}</div>
+            <div class="table-cell">${product.category}</div>
+            <div class="table-cell">${startDate.toLocaleDateString()}</div>
+            <div class="table-cell">${endDate.toLocaleDateString()}</div>
+            <div class="table-cell"><button onclick="removeProduct(${index})">&times;</button></div>
         `;
         productList.appendChild(productItem);
     });
@@ -133,6 +128,7 @@ function removeProduct(index) {
     saveProductsToStorage(); // Guardar productos en localStorage
     calculateTotalPayments(); // Calcular pagos totales
     calculateCategorySummary(); // Calcular resumen de deuda por categoría
+    calculateMonthlyEvolution(); // Calcular evolución mensual
 }
 
 // Función para calcular los pagos totales
@@ -158,21 +154,26 @@ function calculateTotalPayments() {
 
             payments[paymentKey] += monthlyPayment;
             productCount[paymentKey] += 1;
-            productDetails[paymentKey].push({ name: product.name, payment: monthlyPayment.toFixed(2), category: product.category });
+            productDetails[paymentKey].push({ name: product.name, payment: monthlyPayment.toFixed(2), category: product.category, installment: i + 1, totalInstallments: product.installments });
         }
     });
 
     // Mostrar los pagos mensuales
     const totalPayments = document.getElementById('totalPayments');
-    totalPayments.innerHTML = '<h2>Pagos Mensuales:</h2>';
+    totalPayments.innerHTML = '';
     for (let paymentKey in payments) {
         const [year, month] = paymentKey.split('-');
         const paymentItem = document.createElement('div');
         paymentItem.className = 'payment-item';
         paymentItem.innerHTML = `
-            <div class="payment-item-header" onclick="toggleDetails(this)">
-                <p><strong>${getMonthName(month)} ${year}:</strong> <span>$${payments[paymentKey].toFixed(2)} (${productCount[paymentKey]} productos)</span></p>
-                <button class="toggle-button">Ver más</button>
+            <div class="payment-item-header">
+                <div class="donut-chart-container">
+                    <canvas width="50" height="50"></canvas>
+                    <div class="donut-chart-center-text">$${payments[paymentKey].toFixed(2)}</div>
+                </div>
+                <div>
+                    <strong>${getMonthName(month)} ${year}:</strong> $${payments[paymentKey].toFixed(2)} (${productCount[paymentKey]} productos)
+                </div>
             </div>
             <div class="payment-details">
                 <div class="details-text"></div>
@@ -189,12 +190,12 @@ function calculateTotalPayments() {
             categoryGroup.className = 'category-group';
             categoryGroup.innerHTML = `
                 <div class="category-header">
-                    <span class="category-icon" style="background-color: ${getCategoryColor(category)}">${categoryIcons[category]}</span>
-                    <span>${category}</span> - <strong>Total: $${categoryTotal}</strong>
+                    <span class="category-icon" style="background-color: ${getCategoryColor(category)}">${categoryIcons[category]}</span>&nbsp;
+                    <span>${category}</span>:&nbsp;$${categoryTotal}</strong>
                 </div>
             `;
             productsByCategory[category].forEach(detail => {
-                categoryGroup.innerHTML += `<p class="product-item"><strong>${detail.name}:</strong> $${detail.payment}</p>`;
+                categoryGroup.innerHTML += `<p class="product-item"><strong>${detail.name}:</strong> $${detail.payment} (${detail.installment}/${detail.totalInstallments})</p>`;
             });
             paymentDetails.appendChild(categoryGroup);
         }
@@ -202,19 +203,8 @@ function calculateTotalPayments() {
         totalPayments.appendChild(paymentItem);
 
         // Crear la gráfica de dona para cada mes
-        const ctx = document.createElement('canvas');
-        ctx.width = 100;
-        ctx.height = 100;
-        const donutChartContainer = document.createElement('div');
-        donutChartContainer.className = 'donut-chart-container';
-        donutChartContainer.appendChild(ctx);
-        const donutChartCenterText = document.createElement('div');
-        donutChartCenterText.className = 'donut-chart-center-text';
-        donutChartCenterText.textContent = `$${payments[paymentKey].toFixed(2)}`;
-        donutChartContainer.appendChild(donutChartCenterText);
-        paymentItem.querySelector('.payment-details').prepend(donutChartContainer);
-
-        new Chart(ctx.getContext('2d'), {
+        const ctx = paymentItem.querySelector('canvas').getContext('2d');
+        new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels: productDetails[paymentKey].map(detail => detail.name),
@@ -319,7 +309,104 @@ function updateDebtChart(categorySummary, totalDebt) {
     chartCenterText.textContent = `$${totalDebt.toFixed(2)}`;
 }
 
-// Función para obtener el nombre del mes
+// Función para calcular la evolución mensual
+function calculateMonthlyEvolution() {
+    const monthlyData = {};
+    const categories = Object.keys(categoryIcons);
+    const currentDate = new Date();
+
+    // Inicializar todas las categorías para cada mes en los próximos 12 meses
+    for (let i = 0; i < 12; i++) {
+        const paymentKey = `${currentDate.getFullYear()}-${currentDate.getMonth()}`;
+        monthlyData[paymentKey] = {};
+        categories.forEach(category => {
+            monthlyData[paymentKey][category] = 0;
+        });
+        currentDate.setMonth(currentDate.getMonth() + 1);
+    }
+
+    // Calcular los pagos mensuales para cada producto
+    products.forEach(product => {
+        const monthlyPayment = product.price / product.installments;
+        let paymentDate = new Date(product.startDate);
+
+        for (let i = 0; i < product.installments; i++) {
+            const paymentKey = `${paymentDate.getFullYear()}-${paymentDate.getMonth()}`;
+            if (!monthlyData[paymentKey]) {
+                monthlyData[paymentKey] = {};
+                categories.forEach(category => {
+                    monthlyData[paymentKey][category] = 0;
+                });
+            }
+            monthlyData[paymentKey][product.category] += monthlyPayment;
+            paymentDate.setMonth(paymentDate.getMonth() + 1);
+        }
+    });
+
+    const labels = Object.keys(monthlyData).sort();
+    const datasets = categories.map(category => ({
+        label: category,
+        data: labels.map(label => monthlyData[label][category]),
+        borderColor: getCategoryColor(category),
+        backgroundColor: getCategoryColor(category),
+        fill: false,
+        tension: 0.1
+    }));
+
+    const canvas = document.getElementById('monthlyEvoChart');
+    const ctx = canvas.getContext('2d');
+
+    // Asegurarse de que no haya múltiples instancias del gráfico
+    if (evoChart) {
+        evoChart.destroy();
+    }
+
+    // Crear el gráfico de evolución mensual si hay datos disponibles
+    if (labels.length > 0 && datasets.some(dataset => dataset.data.some(value => value > 0))) {
+        evoChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels.map(label => {
+                    const [year, month] = label.split('-');
+                    return `${getMonthName(month)} ${year}`;
+                }),
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Mes'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Monto'
+                        },
+                        beginAtZero: true
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return `${tooltipItem.dataset.label}: $${tooltipItem.raw.toFixed(2)}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
 function getMonthName(month) {
     const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
     return monthNames[parseInt(month)];
@@ -331,22 +418,6 @@ function groupBy(array, key) {
         (result[currentValue[key]] = result[currentValue[key]] || []).push(currentValue);
         return result;
     }, {});
-}
-
-// Función para alternar la visibilidad de los detalles del pago
-function toggleDetails(button) {
-    const paymentItem = button.closest('.payment-item');
-    const paymentDetails = paymentItem.querySelector('.payment-details');
-    const toggleButton = paymentItem.querySelector('.toggle-button');
-
-    paymentDetails.classList.toggle('active');
-    if (paymentDetails.classList.contains('active')) {
-        toggleButton.textContent = 'Ver menos';
-        paymentDetails.style.display = 'block';
-    } else {
-        toggleButton.textContent = 'Ver más';
-        paymentDetails.style.display = 'none';
-    }
 }
 
 // Función para ordenar productos
@@ -382,13 +453,13 @@ function sortProducts(key) {
 
 // Función para actualizar los botones de ordenación
 function updateSortButtons() {
-    const buttons = document.querySelectorAll('.sort-button');
+    const buttons = document.querySelectorAll('.table-cell-header');
     buttons.forEach(button => {
         button.classList.remove('active', 'desc', 'asc');
     });
 
     if (currentSort.key) {
-        const activeButton = document.getElementById(`sort${capitalize(currentSort.key)}`);
+        const activeButton = document.querySelector(`.table-cell-header[onclick="sortProducts('${currentSort.key}')"]`);
         activeButton.classList.add('active');
         if (currentSort.direction === -1) {
             activeButton.classList.add('desc');
@@ -396,11 +467,6 @@ function updateSortButtons() {
             activeButton.classList.add('asc');
         }
     }
-}
-
-// Función para capitalizar la primera letra de una cadena
-function capitalize(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 // Función para guardar los productos en localStorage
@@ -427,3 +493,10 @@ document.getElementById('productForm').addEventListener('submit', function(event
     event.preventDefault();
     addProduct();
 });
+
+// Inicializar la aplicación
+loadProductsFromStorage();
+displayProducts();
+calculateTotalPayments(); // Calcular pagos totales al cargar
+calculateCategorySummary(); // Calcular resumen de deuda por categoría
+calculateMonthlyEvolution(); // Calcular evolución mensual
