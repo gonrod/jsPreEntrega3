@@ -27,6 +27,8 @@ h2 {
 
 #mobileProductAdd {
     display: none;
+    text-align: center;
+    margin: 10px;
 }
 
 #categorySummary {
