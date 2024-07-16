@@ -94,13 +94,13 @@ function displayProducts() {
         const productItem = document.createElement('div');
         productItem.className = 'table-row';
         productItem.innerHTML = `
-            <div class="table-cell">${categoryIcons[product.category]} ${product.name}</div>
-            <div class="table-cell">$${product.price.toFixed(2)}</div>
-            <div class="table-cell">${product.installments}</div>
-            <div class="table-cell">${product.category}</div>
-            <div class="table-cell">${startDate.toLocaleDateString()}</div>
-            <div class="table-cell">${endDate.toLocaleDateString()}</div>
-            <div class="table-cell"><button onclick="removeProduct(${index})">&times;</button></div>
+            <div class="table-cell nam-cell">${categoryIcons[product.category]} ${product.name}</div>
+            <div class="table-cell pri-cell">$${product.price.toFixed(2)}</div>
+            <div class="table-cell ins-cell">${product.installments}</div>
+            <div class="table-cell cat-cell">${product.category}</div>
+            <div class="table-cell sDa-cell">${startDate.toLocaleDateString()}</div>
+            <div class="table-cell eDa-cell">${endDate.toLocaleDateString()}</div>
+            <div class="table-cell acc-cell"><button onclick="removeProduct(${index})">&times;</button></div>
         `;
         productList.appendChild(productItem);
     });
@@ -168,11 +168,10 @@ function calculateTotalPayments() {
         paymentItem.innerHTML = `
             <div class="payment-item-header">
                 <div class="donut-chart-container">
-                    <canvas width="50" height="50"></canvas>
-                    <div class="donut-chart-center-text">$${payments[paymentKey].toFixed(2)}</div>
+                    <canvas></canvas>
                 </div>
                 <div>
-                    <strong>${getMonthName(month)} ${year}:</strong> $${payments[paymentKey].toFixed(2)} (${productCount[paymentKey]} productos)
+                    <strong>${getMonthName(month)} ${year}:</strong><br> $${payments[paymentKey].toFixed(2)} &nbsp;(${productCount[paymentKey]} productos)
                 </div>
             </div>
             <div class="payment-details">
@@ -214,7 +213,7 @@ function calculateTotalPayments() {
                 }]
             },
             options: {
-                responsive: false,
+                responsive: true,
                 plugins: {
                     legend: {
                         display: false
@@ -254,8 +253,10 @@ function calculateCategorySummary() {
             <span class="category-color" style="background-color: ${getCategoryColor(category)}">
                 <span class="category-icon">${categoryIcons[category]}</span>
             </span>
+            <span class="category-percent">${percentage}% </span>
             <span class="category-name">${category}</span>
-            <span class="category-total">$${categorySummary[category].toFixed(2)} (${percentage}%)</span>
+            <span class="category-Amount" style="background-color:${getCategoryColor(category)}"><span>$${categorySummary[category].toFixed(2)}</span></span>
+            
         `;
         debtSummaryElement.appendChild(summaryItem);
     }
@@ -288,7 +289,7 @@ function updateDebtChart(categorySummary, totalDebt) {
             }]
         },
         options: {
-            responsive: false,
+            responsive: true,
             plugins: {
                 legend: {
                     display: false // Desactivar la leyenda
@@ -392,6 +393,7 @@ function calculateMonthlyEvolution() {
                 },
                 plugins: {
                     legend: {
+                        display: false,
                         position: 'top',
                     },
                     tooltip: {
